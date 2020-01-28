@@ -1,46 +1,77 @@
 import psycopg2
+import datetime
 
+dt = datetime.datetime.now()
 connection = psycopg2.connect(
-  database="main_data_db",
-  user="ilya_erlingas",
-  password="3322879",
-  host="127.0.0.1",
-  port="5432"
+    database="main_data_db",
+    user="ilya_erlingas",
+    password="3322879",
+    host="127.0.0.1",
+    port="5432"
 )
 cur = connection.cursor()
 print("Database opened successfully")
 
 
-def create_db():    # создает таблицы
-    cur.execute('''CREATE TABLE STUDENT  
+def create_db():  # создает таблицы
+
+    cur.execute('''CREATE TABLE STUDENT
          (ID INT PRIMARY KEY NOT NULL,
          NAME TEXT NOT NULL,
          GPA NUMERIC(10,2),
-         BIRTH TIMESTAMP WITH TIME ZONE;''')
-    cur.execute('''CREATE TABLE COURSE  
+         BIRTH TIMESTAMP WITH TIME ZONE
+         )''')
+
+    cur.execute('''CREATE TABLE COURSE
              (ID INT PRIMARY KEY NOT NULL,
-             NAME CHARACTER VARYING(100) NOT NULL,;''')
+             NAME CHARACTER VARYING(100) NOT NULL
+             )''')
 
 
-def get_students(course_id):    # возвращает студентов определенного курса
-    for name in cur.execute('SELECT NAME FROM CURSE WHERE NAME={course_id};'):
-        print(name)
+create_db()
 
 
-def add_students(course_id, students):  # создает студентов и
-    for course_id, students in cur.execute('INSERT INTO STUDENT (ID, NAME, GPA, BIRTH) VALUES(1, "Игорь", 10, 112);', course_id, students):  # записывает их на курс
-        print({students}, "Добавлен в базу")
-        print(course_id)
+def get_students(course_id):  # возвращает студентов определенного курса
+    cur.execute('SELECT NAME FROM COURSE WHERE ID=1',
+                course_id)
+    return course_id
 
 
-def add_student(student): # просто создает студента
-    for student in cur.execute('INSERT INTO STUDENT(NAME) VALUES("Диана");', student):
-        print(student, "Добавление выполнено успешно!")
+get_students(1)
+
+
+def add_students(students, course_id):  # создает студентов и
+    cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s)',
+                students)
+    print(students)
+    connection.commit()
+
+    cur.execute("INSERT INTO COURSE VALUES(%s)",
+                course_id)
+
+
+add_students('Дмитрий', '78')
+
+
+def add_student(student):  # просто создает студента
+    cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s);',
+                student)
+    print(student, "Добавление выполнено успешно!")
+    connection.commit()
+
+
+add_student('Дмитрий')
 
 
 def get_student(student_id):
-    for id_1 in cur.execute('SELECT ID FROM STUDENT WHERE ID=student_id;'):
-        print(id_1)
+    cur.execute('SELECT ID'
+                'FROM STUDENT'
+                'WHERE ID=student_id;',
+                student_id)
+    print(student_id)
 
 
+get_student(1)
+
+cur.close()
 connection.close()
