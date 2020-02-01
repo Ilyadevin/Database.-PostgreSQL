@@ -19,59 +19,58 @@ def create_db():  # создает таблицы
          (ID INT PRIMARY KEY NOT NULL,
          NAME TEXT NOT NULL,
          GPA NUMERIC(10,2),
-         BIRTH TIMESTAMP WITH TIME ZONE
-         )''')
+         BIRTH TIMESTAMP WITH TIME ZONE)
+         ''')
+    connection.commit()
 
     cur.execute('''CREATE TABLE COURSE
              (ID INT PRIMARY KEY NOT NULL,
-             NAME CHARACTER VARYING(100) NOT NULL
-             )''')
+             NAME CHARACTER VARYING(100) NOT NULL)
+             ''')
+    connection.commit()
 
 
 create_db()
 
 
 def get_students(course_id):  # возвращает студентов определенного курса
-    cur.execute('SELECT NAME FROM COURSE WHERE ID=1',
+    cur.execute('SELECT NAME FROM COURSE WHERE ID=%s',
                 course_id)
-    return course_id
+    cur.fetchall()
 
 
-get_students(1)
+get_students('1')
 
 
 def add_students(students, course_id):  # создает студентов и
     cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s)',
-                students)
-    print(students)
-    connection.commit()
-
-    cur.execute("INSERT INTO COURSE VALUES(%s)",
+                students,
+                'insert into COURSE(NAME) VALUES(%s)',
                 course_id)
+
+    connection.commit()
 
 
 add_students('Дмитрий', '78')
 
 
 def add_student(student):  # просто создает студента
-    cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s);',
+    cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s)',
                 student)
-    print(student, "Добавление выполнено успешно!")
     connection.commit()
+    print(student, "Добавление выполнено успешно!")
 
 
 add_student('Дмитрий')
 
 
 def get_student(student_id):
-    cur.execute('SELECT ID'
-                'FROM STUDENT'
-                'WHERE ID=student_id;',
+    cur.execute('SELECT NAME FROM STUDENT WHERE ID=%s;',
                 student_id)
-    print(student_id)
+    cur.fetchall()
 
 
-get_student(1)
+get_student('1')
 
 cur.close()
 connection.close()
