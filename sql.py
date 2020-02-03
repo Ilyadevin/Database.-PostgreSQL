@@ -13,40 +13,41 @@ cur = connection.cursor()
 print("Database opened successfully")
 
 
-def create_db():  # создает таблицы
-
-    cur.execute('''CREATE TABLE STUDENT
-         (ID SERIAL PRIMARY KEY NOT NULL,
-         NAME TEXT NOT NULL,
-         GPA NUMERIC(10,2),
-         BIRTH TIMESTAMP WITH TIME ZONE);
-         ''')
-    connection.commit()
-
-    cur.execute('''CREATE TABLE COURSE
-             (ID SERIAL PRIMARY KEY NOT NULL,
-             NAME CHARACTER VARYING(100) NOT NULL);
-             ''')
-    connection.commit()
-
-    cur.execute('''CREATE TABLE STUDENTS_AND_COURSES
-                (ID_1 SERIAL PRIMARY KEY,
-                STUDENT_ID INTEGER REFERENCES STUDENT(ID),
-                COURSE_ID INTEGER REFERENCES COURSE(ID));
-                ''')
-
-    connection.commit()
-
-
-create_db()
+# def create_db():  # создает таблицы
+#
+#     cur.execute('''CREATE TABLE STUDENT
+#          (ID SERIAL PRIMARY KEY NOT NULL,
+#          NAME TEXT NOT NULL,
+#          GPA NUMERIC(10,2),
+#          BIRTH TIMESTAMP WITH TIME ZONE);
+#          ''')
+#     connection.commit()
+#
+#     cur.execute('''CREATE TABLE COURSE
+#              (ID SERIAL PRIMARY KEY NOT NULL,
+#              NAME CHARACTER VARYING(100) NOT NULL);
+#              ''')
+#     connection.commit()
+#
+#     cur.execute('''CREATE TABLE STUDENTS_AND_COURSES
+#                 (ID_1 SERIAL PRIMARY KEY,
+#                 STUDENT_ID INTEGER REFERENCES STUDENT(ID),
+#                 COURSE_ID INTEGER REFERENCES COURSE(ID));
+#                 ''')
+#
+#     connection.commit()
+#
+#
+# create_db()
 
 
 def get_students(course_id):  # возвращает студентов определенного курса
-    student_id_1 = cur.execute('SELECT STUDENT_ID FROM STUDENTS_AND_COURSES WHERE COURSE_ID=%s;',
-                               (course_id,))
-    cur.execute('SELECT NAME, GPA, BIRTH FROM STUDENT WHERE ID=%s;',
-                (student_id_1,))
-    cur.fetchall()
+    cur.execute('SELECT student.id as course_id, STUDENT.NAME AS NAME, STUDENT.GPA, STUDENT.BIRTH as BIRTH, '
+                'course.id as course_id, course.name as course_name '
+                'FROM STUDENT '
+                'INNER JOIN COURSE ON COURSE.id = STUDENT.id;',
+                (course_id,))
+    print(cur.fetchall())
     return cur.fetchall()
 
 
@@ -60,6 +61,7 @@ def add_students(students, course_id):  # создает студентов и
                 (course_id,))
     connection.commit()
     print("Студент(ы): ", students, 'добавлен(ы) в список студентов и на курс ', course_id)
+    print('Данные о студенте(ах)', students, course_id, "добавлены в общую таблицу")
     return connection.commit()
 
 
@@ -78,7 +80,7 @@ add_student('Карина')
 
 
 def get_student(student_id):
-    cur.execute('SELECT NAME FROM COURSE WHERE ID=%s;',
+    cur.execute('SELECT NAME FROM STUDENT WHERE ID=%s;',
                 (student_id,))
     return cur.fetchall()
 
