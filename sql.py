@@ -42,10 +42,8 @@ print("Database opened successfully")
 
 
 def get_students(course_id):  # возвращает студентов определенного курса
-    cur.execute('SELECT student.id as course_id, STUDENT.NAME AS NAME, STUDENT.GPA, STUDENT.BIRTH as BIRTH, '
-                'course.id as course_id, course.name as course_name '
-                'FROM STUDENT '
-                'INNER JOIN COURSE ON COURSE.id = STUDENT.id;',
+    cur.execute('SELECT STUDENT.ID, STUDENT.NAME, STUDENT.GPA, STUDENT.BIRTH, COURSE.ID, COURSE.NAME'
+                ' FROM STUDENT INNER JOIN COURSE ON COURSE.ID = STUDENT.ID;',
                 (course_id,))
     print(cur.fetchall())
     return cur.fetchall()
@@ -61,7 +59,7 @@ def add_students(students, course_id):  # создает студентов и
                 (course_id,))
     connection.commit()
     print("Студент(ы): ", students, 'добавлен(ы) в список студентов и на курс ', course_id)
-    print('Данные о студенте(ах)', students, course_id, "добавлены в общую таблицу")
+    print('Данные о студенте(ах) добавлены!')
     return connection.commit()
 
 
@@ -72,7 +70,7 @@ def add_student(student):  # просто создает студента
     cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s);',
                 (student,))
     connection.commit()
-    print(student, "Добавление выполнено успешно!")
+    print(student, "добавление выполнено успешно!")
     return connection.commit()
 
 
