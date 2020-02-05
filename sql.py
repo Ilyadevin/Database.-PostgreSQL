@@ -13,32 +13,32 @@ cur = connection.cursor()
 print("Database opened successfully")
 
 
-# def create_db():  # создает таблицы
-#
-#     cur.execute('''CREATE TABLE STUDENT
-#          (ID_STUDENT SERIAL PRIMARY KEY NOT NULL,
-#          NAME TEXT NOT NULL,
-#          GPA NUMERIC(10,2),
-#          BIRTH TIMESTAMP WITH TIME ZONE);
-#          ''')
-#     connection.commit()
-#
-#     cur.execute('''CREATE TABLE COURSE
-#              (ID_COURSE SERIAL PRIMARY KEY NOT NULL,
-#              NAME CHARACTER VARYING(100) NOT NULL);
-#              ''')
-#     connection.commit()
-#
-#     cur.execute('''CREATE TABLE STUDENTS_AND_COURSES
-#                 (ID_1 SERIAL PRIMARY KEY,
-#                 STUDENT_ID INTEGER REFERENCES STUDENT(ID_STUDENT),
-#                 COURSE_ID INTEGER REFERENCES COURSE(ID_COURSE));
-#                 ''')
-#
-#     connection.commit()
-#
-#
-# create_db()
+def create_db():  # создает таблицы
+
+    cur.execute('''CREATE TABLE STUDENT
+         (ID_STUDENT SERIAL PRIMARY KEY NOT NULL,
+         NAME TEXT NOT NULL,
+         GPA NUMERIC(10,2),
+         BIRTH TIMESTAMP WITH TIME ZONE);
+         ''')
+    connection.commit()
+
+    cur.execute('''CREATE TABLE COURSE
+             (ID_COURSE SERIAL PRIMARY KEY NOT NULL,
+             NAME CHARACTER VARYING(100) NOT NULL);
+             ''')
+    connection.commit()
+
+    cur.execute('''CREATE TABLE STUDENTS_AND_COURSES
+                (ID_1 SERIAL PRIMARY KEY,
+                STUDENT_ID INTEGER REFERENCES STUDENT(ID_STUDENT),
+                COURSE_ID INTEGER REFERENCES COURSE(ID_COURSE));
+                ''')
+
+    connection.commit()
+
+
+create_db()
 
 
 def get_students(course_id):  # возвращает студентов определенного курса
