@@ -67,11 +67,13 @@ def add_students(students, course_id):  # создает студентов и
 
     connection.commit()
 
-    cur.execute('insert into students_and_courses(student_id, course_id)'
-                'select ID_S, ID_C '
-                'from student, course '
-                'where student.ID_S=course.ID_C;')
+    cur.execute('select ID_S, NAME from student ID_S '
+                'join course NAME on ID_S = ID_C;')
 
+    rows = cur.fetchall()
+
+    for row in rows:
+        print(row)
     connection.commit()
 
     print("Студент(ы): ", students, 'добавлен(ы) в список студентов и на курс ', course_id)
@@ -81,7 +83,7 @@ def add_students(students, course_id):  # создает студентов и
     return connection.commit()
 
 
-add_students('Игорь', '9')
+add_students('Игорь', '8')
 
 
 def add_student(student):  # просто создает студента
