@@ -45,7 +45,7 @@ create_db()
 
 def get_students(course_id):  # возвращает студентов определенного курса
     cur.execute('SELECT STUDENT.ID_S, STUDENT.NAME, STUDENT.GPA, STUDENT.BIRTH, COURSE.ID_C, COURSE.NAME'
-                ' FROM STUDENT INNER JOIN COURSE ON COURSE.ID_C = STUDENT.ID_S;',
+                ' FROM STUDENT INNER JOIN COURSE ON COURSE.ID_C = %s;',
                 (course_id,))
 
     print(cur.fetchall())
@@ -57,23 +57,17 @@ get_students('1')
 
 
 def add_students(students, course_id):  # создает студентов и
-    cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s);',
+    cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s) RETURNING ID_S;',
                 (students,))
+    id_from_student = cur.fetchall()[0]
 
-    connection.commit()
-
-    cur.execute('insert into COURSE(NAME) VALUES(%s);',
+    cur.execute('INSERT INTO COURSE(NAME) VALUES(%s)RETURNING ID_C;',
                 (course_id,))
+    id_from_course = cur.fetchall()[0]
 
-    connection.commit()
+    cur.execute('INSERT INTO STUDENTS_AND_COURSES(STUDENT_ID, COURSE_ID) VALUES(%s, %s);',
+                (id_from_student, id_from_course,))
 
-    cur.execute('select ID_S, NAME from student ID_S '
-                'join course NAME on ID_S = ID_C;')
-
-    rows = cur.fetchall()
-
-    for row in rows:
-        print(row)
     connection.commit()
 
     print("Студент(ы): ", students, 'добавлен(ы) в список студентов и на курс ', course_id)
