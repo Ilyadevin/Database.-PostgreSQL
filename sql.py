@@ -43,65 +43,61 @@ def create_db():  # создает таблицы
 create_db()
 
 
-def get_students(course_id):  # возвращает студентов определенного курса
-    cur.execute('SELECT STUDENT.ID_S, STUDENT.NAME, STUDENT.GPA, STUDENT.BIRTH, COURSE.ID_C, COURSE.NAME'
-                ' FROM STUDENT INNER JOIN COURSE ON COURSE.ID_C = %s;',
-                (course_id,))
+class WorkWithSQL:
+    def __init__(self):
+        pass
 
-    print(cur.fetchall())
+    def get_students(self, course_id):
+        cur.execute('SELECT STUDENT.ID_S, STUDENT.NAME, STUDENT.GPA, STUDENT.BIRTH, COURSE.ID_C, COURSE.NAME'
+                    ' FROM STUDENT INNER JOIN COURSE ON COURSE.ID_C = %s;',
+                    (course_id,))
 
-    return cur.fetchall()
+        print(cur.fetchall())
 
+        return cur.fetchall()
 
-get_students('1')
+    def add_students(self, students, course_id):
+        cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s) RETURNING ID_S;',
+                    (students,))
+        id_from_student = cur.fetchall()[0]
 
+        cur.execute('INSERT INTO COURSE(NAME) VALUES(%s)RETURNING ID_C;',
+                    (course_id,))
+        id_from_course = cur.fetchall()[0]
 
-def add_students(students, course_id):  # создает студентов и
-    cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s) RETURNING ID_S;',
-                (students,))
-    id_from_student = cur.fetchall()[0]
+        cur.execute('INSERT INTO STUDENTS_AND_COURSES(STUDENT_ID, COURSE_ID) VALUES(%s, %s);',
+                    (id_from_student, id_from_course,))
 
-    cur.execute('INSERT INTO COURSE(NAME) VALUES(%s)RETURNING ID_C;',
-                (course_id,))
-    id_from_course = cur.fetchall()[0]
+        connection.commit()
 
-    cur.execute('INSERT INTO STUDENTS_AND_COURSES(STUDENT_ID, COURSE_ID) VALUES(%s, %s);',
-                (id_from_student, id_from_course,))
+        print("Студент(ы): ", students, 'добавлен(ы) в список студентов и на курс ', course_id)
 
-    connection.commit()
+        print('Данные о студенте(ах) добавлены!')
 
-    print("Студент(ы): ", students, 'добавлен(ы) в список студентов и на курс ', course_id)
+        return connection.commit()
 
-    print('Данные о студенте(ах) добавлены!')
+    def add_student(self, student):
+        cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s);',
+                    (student,))
 
-    return connection.commit()
+        connection.commit()
 
+        print(student, "добавление выполнено успешно!")
 
-add_students('Игорь', '8')
+        return connection.commit()
 
+    def get_student(self, student_id):
+        cur.execute('SELECT NAME FROM STUDENT WHERE ID_S=%s;',
+                    (student_id,))
 
-def add_student(student):  # просто создает студента
-    cur.execute('INSERT INTO STUDENT(NAME) VALUES(%s);',
-                (student,))
-
-    connection.commit()
-
-    print(student, "добавление выполнено успешно!")
-
-    return connection.commit()
-
-
-add_student('Карина')
-
-
-def get_student(student_id):
-    cur.execute('SELECT NAME FROM STUDENT WHERE ID_S=%s;',
-                (student_id,))
-
-    return cur.fetchall()
+        return cur.fetchall()
 
 
-get_student('1')
+SQL = WorkWithSQL()
+SQL.get_student(input('Студентов какого курса необходимо получить? '))
+SQL.add_students(input('Введите имя студента для записи: '), input('Введите курс на который нужно записать студента: '))
+SQL.add_student(input('Введите имя студента, без записи на курс: '))
+SQL.get_student(input('Студент по сирийному номеру: '))
 
 cur.close()
 connection.close()
